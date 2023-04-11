@@ -86,13 +86,13 @@ st.write("""
     if not, click *"Reset"* then record again. Once you are pleased with your
     recording, press *"Evaluate"* to see what genre your song may be and to
     see some recommendations from Spotify.
-    """)
-st.write("""
-    *Note: The listening model is only as good as the input, longer is typically 
-    better, and less background noise is always appreciated!*
+    
+    *Some Notes:*
+    - The listening model is only as good as the input, longer is typically 
+    better, and less background noise is always appreciated!
 
-    *In addition, because classical music tends to be at a lower average volumne, 
-    if you get classical and do not think it applies, try playing the song louder.* 
+    - In addition, because classical music tends to be at a lower average volumne, 
+    if you get classical and do not think it applies, try playing the song louder.
     """)
 
 
