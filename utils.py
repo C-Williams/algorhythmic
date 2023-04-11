@@ -42,12 +42,6 @@ name_dict = {0: 'pop',1: 'rap',2: 'modern rock',3: 'urbano latino',4: 'edm',5: '
             39: 'nu jazz',40: 'boy band',41: 'desi hip hop',42: 'electronica',43: 'permanent wave',
             44: 'indietronica',45: 'punk',46: 'modern blues',47: 'vapor trap',48: 'mpb',49: 'classical'}
 
-# Set up the Spotify client credentials
-client_id = st.secrets["CLIENT_ID"] # Also lives in .env
-client_secret = st.secrets["CLIENT_SECRET"] # Also lives in .env
-# Instantiate the response
-client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 # Set up the scaling process
@@ -109,7 +103,7 @@ def condense_output_data(df, duration):
     return to_return
 
 
-def display_spotify(song_title, artist_name, num):
+def display_spotify(sp, song_title, artist_name, num):
     
     # Search for the track
     results = sp.search(q=f"{song_title}, {artist_name}", type='track')
@@ -130,7 +124,7 @@ def display_spotify(song_title, artist_name, num):
             st.image(image_url)
 
 
-def get_spotify_df(song_title, artist_name):
+def get_spotify_df(sp, song_title, artist_name):
     st.write("Creating DataFrame...")
     st.write("For a deeper explanation of these values see 'What is Sound'")
 
@@ -303,7 +297,7 @@ def predict_output(model, path="./output.wav"):
     return new_df
 
 
-def get_spotify_recs(df):
+def get_spotify_recs(sp, df):
 
     genre_list = df.index.to_list()
     
