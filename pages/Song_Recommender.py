@@ -140,7 +140,13 @@ st.write("""
     """)
 
 
+@st.cache_data
+def create_wav():
+    with open('output.wav', mode='bw') as f:
+        f.write(wav_audio_data)
+
 wav_audio_data = st_audiorec()
+
 
 if wav_audio_data is not None:
     st.session_state.recorded = True
@@ -149,8 +155,7 @@ if st.session_state.recorded:
 
     if st.button("Evalute"):
         try:
-            with open('output.wav', mode='bw') as f:
-                f.write(wav_audio_data)
+            create_wav()
 
             listen_preds = predict_output(model=listen_model)
             st.write(listen_preds)
