@@ -1,11 +1,18 @@
 import streamlit as st
-from utils import (#get_audio, 
-                   name_dict, 
+
+# Imports for tensorflow
+import tensorflow as tf
+from tensorflow import keras
+
+import xgboost as xgb
+
+from utils import (name_dict, 
                    display_spotify, 
                    get_spotify_df,
                    predict_spotify,
                    predict_output,
                    get_spotify_recs)
+
 from st_custom_components import st_audiorec
 
 # Session states for Listening Prediction
@@ -60,6 +67,25 @@ def reset_form():
     st.session_state.predicted_spotify = False
 
 
+@st.cache_resource
+def load_scraping_model():
+    # Set the model for Spotify Scraping
+    scrape_model = keras.models.load_model('./models/keras_2/')
+    return scrape_model
+
+scrape_model = load_scraping_model()
+
+
+@st.cache_resource
+def load_listening_model():
+    # Set the model for listening
+    listen_model = xgb.XGBClassifier()
+    listen_model.load_model('./models/new_xgb.h5')
+    return listen_model
+
+listen_model = load_listening_model()  
+    
+
 st.markdown("# Let's test the models!") 
 st.write("")
 st.write("")
@@ -107,7 +133,7 @@ if st.session_state.recorded:
         try:
             with open('output.wav', mode='bw') as f:
                 f.write(wav_audio_data)
-            listen_preds = predict_output()
+            listen_preds = predict_output(model=listen_model)
             st.write(listen_preds)
             st.write("Here are some less known songs from these genres!")
             get_spotify_recs(listen_preds)
@@ -166,7 +192,7 @@ if st.session_state.shown_albums:
         st.write("")
         st.write("Reducing DataFrame and Making Predictions...")
 
-        spotify_preds = predict_spotify(df_spotify)
+        spotify_preds = predict_spotify(df_spotify, model=scrape_model)
 
         st.write(spotify_preds)
 
