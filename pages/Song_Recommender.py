@@ -13,6 +13,10 @@ from utils import (name_dict,
                    predict_output,
                    get_spotify_recs)
 
+# Imports for scraping Spotify
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
 from st_custom_components import st_audiorec
 
 # Session states for Listening Prediction
@@ -65,6 +69,20 @@ def reset_form():
     st.session_state.shown_albums = False
     st.session_state.lock_buttons = False
     st.session_state.predicted_spotify = False
+
+
+@st.cache_resource(ttl=3600)
+def api_call():
+    # Set up the Spotify client credentials
+    client_id = st.secrets["CLIENT_ID"] # Also lives in .env
+    client_secret = st.secrets["CLIENT_SECRET"] # Also lives in .env
+    # Instantiate the response
+    client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+    return sp
+
+sp = api_call()
 
 
 @st.cache_resource
@@ -133,10 +151,12 @@ if st.session_state.recorded:
         try:
             with open('output.wav', mode='bw') as f:
                 f.write(wav_audio_data)
+
             listen_preds = predict_output(model=listen_model)
             st.write(listen_preds)
+
             st.write("Here are some less known songs from these genres!")
-            get_spotify_recs(listen_preds)
+            get_spotify_recs(sp, listen_preds)
             st.session_state.predicted_listen = True
             st.write("""
             If you would like to test another sound, scroll up and click *"Reset"*,
@@ -166,7 +186,7 @@ with st.form("my_form"):
 
 if st.session_state.display:
     
-    display_spotify(song_title, artist_name, 0)
+    display_spotify(sp, song_title, artist_name, 0)
     col1, col2 = st.columns(2)
     with col1:
         yes1 = st.button('Yes', 
@@ -184,7 +204,7 @@ if st.session_state.wrong_guess:
 
 if st.session_state.shown_albums:
     try:
-        df_spotify = get_spotify_df(song_title, artist_name)
+        df_spotify = get_spotify_df(sp, song_title, artist_name)
 
 
         st.write(df_spotify)
@@ -197,7 +217,7 @@ if st.session_state.shown_albums:
         st.write(spotify_preds)
 
         if st.button("Would you like to some songs recommendations?", key='second'):
-            get_spotify_recs(spotify_preds)
+            get_spotify_recs(sp, spotify_preds)
     
         st.session_state.predicted_spotify = True
     
