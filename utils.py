@@ -24,14 +24,11 @@ from sklearn import preprocessing
 import streamlit as st
 import os
 
-# Get the full DataFrame of information
-dir_path = './data/'
-csv_files = [file for file in os.listdir(dir_path) if file.endswith('.csv')]
-df_list = []
-for file in csv_files:
-    df = pd.read_csv(os.path.join(dir_path, file))
-    df_list.append(df)
-full_df = pd.concat(df_list, ignore_index=True)
+# Set the list of features that are important for the model
+important_features = ['tempo','start_max_std','mfcc3_mean','start_max_mean','loud_time_mean',
+                      'max_loud_mean','chroma1_mean','mfcc10_mean','mfcc5_mean','mfcc3_std',
+                      'mfcc7_mean','max_loud_std','mfcc1_mean','chroma0_mean','mfcc9_mean',
+                      'mfcc2_mean','mfcc0_mean']
 
 # Set the list of possible genres
 name_dict = {0: 'pop',1: 'rap',2: 'modern rock',3: 'urbano latino',4: 'edm',5: 'latin pop',
@@ -44,20 +41,6 @@ name_dict = {0: 'pop',1: 'rap',2: 'modern rock',3: 'urbano latino',4: 'edm',5: '
             34: 'singer-songwriter',35: 'trap argentino',36: 'dark trap',37: 'hoerspiel',38: 'indie soul',
             39: 'nu jazz',40: 'boy band',41: 'desi hip hop',42: 'electronica',43: 'permanent wave',
             44: 'indietronica',45: 'punk',46: 'modern blues',47: 'vapor trap',48: 'mpb',49: 'classical'}
-
-# Set the list of features that are important for the model
-important_features = ['tempo','start_max_std','mfcc3_mean','start_max_mean','loud_time_mean',
-                      'max_loud_mean','chroma1_mean','mfcc10_mean','mfcc5_mean','mfcc3_std',
-                      'mfcc7_mean','max_loud_std','mfcc1_mean','chroma0_mean','mfcc9_mean',
-                      'mfcc2_mean','mfcc0_mean']
-
-
-# Set the model for Spotify Scraping
-scrape_model = keras.models.load_model('./models/keras_2/')
-# Set the model for listening
-listen_model = xgb.XGBClassifier()
-listen_model.load_model('./models/new_xgb.h5')
-
 
 # Set up the Spotify client credentials
 client_id = st.secrets["CLIENT_ID"] # Also lives in .env
@@ -241,14 +224,14 @@ def get_spotify_df(song_title, artist_name):
     return(temp_df)
 
 
-def predict_spotify(df):
+def predict_spotify(df, model):
     
     df = df[important_features]
         
     df_keras = tf.convert_to_tensor(df)
     
     probs_list = []
-    preds = scrape_model.predict(df_keras)
+    preds = model.predict(df_keras)
     for pred in preds:
         probs_list.append(np.argsort(pred)[::-1][:3])
 
@@ -268,7 +251,7 @@ def predict_spotify(df):
     return new_df
 
 
-def predict_output(path="./output.wav"):
+def predict_output(model, path="./output.wav"):
 
     y, sr = librosa.load(path)
     duration = librosa.get_duration(y=y, sr=sr)
@@ -300,7 +283,7 @@ def predict_output(path="./output.wav"):
     combined['tempo'] = tempo
 
     probs_list = []
-    pred_probs = listen_model.predict_proba(combined)
+    pred_probs = model.predict_proba(combined)
 
     for pred in pred_probs:
         probs_list.append(np.argsort(pred)[::-1][:3])
