@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+import os
+
 import matplotlib.pyplot as plt
 
 import seaborn as sns
@@ -9,29 +11,85 @@ import seaborn as sns
 import plotly.graph_objects as go
 import plotly.express as px
 
-from utils import full_df, important_features
+# Set the list of features that are important for the model
+important_features = ['tempo','chroma0_mean','chroma1_mean',
+                      'mfcc0_mean','mfcc1_mean','mfcc2_mean',
+                      'mfcc3_mean', 'start_max_mean','max_loud_mean']
 
-artist_df = full_df.drop_duplicates(subset='title', keep='first')
-artist_df = artist_df[['artist','title','year','genre']]
-artist_df.reset_index(inplace=True, drop=True)
+@st.cache_data
+def make_full_df():
+    dir_path = './data/'
+    csv_files = [file for file in os.listdir(dir_path) if file.endswith('.csv')]
+    df_list = []
+    for file in csv_files:
+        df = pd.read_csv(os.path.join(dir_path, file))
+        df_list.append(df)
+    full_df = pd.concat(df_list, ignore_index=True)
 
-grouped_df = artist_df.groupby('genre')['title'].nunique().sort_values(ascending=False).reset_index()
-temp_year = artist_df.groupby('genre')[['year']].mean().round().astype(int)
-grouped_df = grouped_df.merge(temp_year, on='genre')
-grouped_df.columns = ['genre','count','avg_year']
-grouped_df['genre'] = grouped_df['genre'].str.title()
+    return full_df
 
-year_df = artist_df.groupby('year')[['title']].count().reset_index()
-year_df = year_df[1:]
-temp_title = artist_df.groupby('year')['title'].unique().reset_index()
-temp_title = pd.DataFrame(temp_title)
-temp_title = temp_title[1:]
-year_df = year_df.merge(temp_title, on='year')
-year_df['year'] = year_df['year'].astype(str)
-year_df.columns = ['year','count','title']
+
+@st.cache_data
+def make_artist_df():
+    artist_df = full_df.drop_duplicates(subset='title', keep='first')
+    artist_df = artist_df[['artist','title','year','genre']]
+    artist_df.reset_index(inplace=True, drop=True)
+
+    return artist_df
+
+
+@st.cache_data
+def make_grouped_df():
+    grouped_df = artist_df.groupby('genre')['title'].nunique().sort_values(ascending=False).reset_index()
+    temp_year = artist_df.groupby('genre')[['year']].mean().round().astype(int)
+    grouped_df = grouped_df.merge(temp_year, on='genre')
+    grouped_df.columns = ['genre','count','avg_year']
+    grouped_df['genre'] = grouped_df['genre'].str.title()
+
+    return grouped_df
+
+
+@st.cache_data
+def make_year_df():
+    year_df = artist_df.groupby('year')[['title']].count().reset_index()
+    year_df = year_df[1:]
+    temp_title = artist_df.groupby('year')['title'].unique().reset_index()
+    temp_title = pd.DataFrame(temp_title)
+    temp_title = temp_title[1:]
+    year_df = year_df.merge(temp_title, on='year')
+    year_df['year'] = year_df['year'].astype(str)
+    year_df.columns = ['year','count','title']
+
+    return year_df
+
+
+@st.cache_data
+def make_genre_plot():
+    fig = px.bar(grouped_df, x='genre', y='count',
+                hover_data=['count','avg_year'], color='genre',
+                labels={'count':'Count of Songs','avg_year': 'Avg Release Year'}, height=600)
+    fig.update_layout(showlegend=False)
+    st.plotly_chart(fig, use_container_width=True)
+
+
+@st.cache_data
+def make_year_plot():
+    fig1 = px.bar(year_df, x='year', y='count',
+                hover_data=['count'], color='year',
+                labels={'title':'Count of Songs'}, height=600,
+                color_discrete_sequence=px.colors.qualitative.G10)
+    fig1.update_layout(showlegend=False)
+    st.plotly_chart(fig1, use_container_width=True)
+
+
+full_df = make_full_df()
+artist_df = make_artist_df()
+grouped_df = make_grouped_df()
+year_df = make_year_df()
+
 
 if "variable" not in st.session_state:
-    st.session_state["variable"] = "tempo"
+    st.session_state.variable = "tempo"
 
 st.write("# Data Time!")
 st.write("""
@@ -50,18 +108,8 @@ st.write("""
 st.write("#### Artists and Songs")
 st.dataframe(artist_df)
 
-fig = px.bar(grouped_df, x='genre', y='count',
-             hover_data=['count','avg_year'], color='genre',
-             labels={'count':'Count of Songs','avg_year': 'Avg Release Year'}, height=600)
-fig.update_layout(showlegend=False)
-st.plotly_chart(fig, use_container_width=True)
-
-fig1 = px.bar(year_df, x='year', y='count',
-             hover_data=['count'], color='year',
-             labels={'title':'Count of Songs'}, height=600,
-             color_discrete_sequence=px.colors.qualitative.G10)
-fig1.update_layout(showlegend=False)
-st.plotly_chart(fig1, use_container_width=True)
+make_genre_plot()
+make_year_plot()
 
 st.write("#### Why these songs and genres?")
 
@@ -133,7 +181,7 @@ st.write("""
     * Chroma describes which note is heard at a given time
         * Chroma 0 is C natural
         * Chroma 1 is C#
-    * Start_Max, Loud_Time, and Max_Loud are proprietary terms that [Spotify](https://developer.spotify.com/documentation/web-api/reference/get-audio-analysis) has derived and describes as:
+    * Start_Max and Max_Loud are proprietary terms that [Spotify](https://developer.spotify.com/documentation/web-api/reference/get-audio-analysis) has derived and describes as:
         * Combined, these components can be used to desctibe the "attack" of each segment of a song
     """)
 
