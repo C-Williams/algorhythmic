@@ -1,3 +1,3 @@
 Hello!
 
-And Welcome to a repo!
+Welcome to Algorhythmic! This site is currently under construction.
