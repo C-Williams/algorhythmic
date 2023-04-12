@@ -97,8 +97,8 @@ if st.button("Evalute"):
         get_spotify_recs(sp, listen_preds)
         st.session_state.predicted_listen = True
         st.write("""
-        If you would like to test another sound, scroll up and click *"Reset"*,
-        then *"Start Recording"* again.""")
+        If you would like to test another sound, scroll up and click the 
+        microphone again.""")
     except TypeError:
         st.write("""
         Be sure you have recorded some noise before pressing *"Evaluate"*.
