@@ -82,13 +82,17 @@ audio_bytes = audio_recorder(
     icon_size="6x",
 )
 
+@st.cache_resource
+def make_wav(audio):
+    with open('./output.wav', mode='bw') as f:
+        f.write(audio)
+
 if audio_bytes:
     st.audio(audio_bytes, format="audio/wav")
 
 if st.button("Evalute"):
     try:
-        with open('./output.wav', mode='bw') as f:
-            f.write(audio_bytes)
+        make_wav(audio_bytes)
 
         listen_preds = predict_output(model=listen_model)
         st.write(listen_preds)
