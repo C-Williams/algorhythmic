@@ -81,7 +81,6 @@ audio_bytes = audio_recorder(
     icon_name="microphone",
     icon_size="6x",
 )
-st.caption("Source code for recorder [here](https://github.com/Joooohan/audio-recorder-streamlit)")
 
 if audio_bytes:
     st.audio(audio_bytes, format="audio/wav")
@@ -111,4 +110,5 @@ st.text("")
 st.text("")
 st.text("")
 st.text("")
+st.caption("Source code for recorder [here](https://github.com/Joooohan/audio-recorder-streamlit)")
 st.caption("Built by Chris Williams as part of Spiced Academy Berlin")
