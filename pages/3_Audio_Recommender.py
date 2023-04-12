@@ -66,7 +66,7 @@ st.write("""
     - The listening model is only as good as the input, longer is typically 
     better, and less background noise is always appreciated!
 
-    - In addition, because classical and hoerspield music tends to be at a lower 
+    - In addition, because classical and hoerspiel music tends to be at a lower 
     average volumne, if you get either of these and do not think they apply, try 
     playing the song louder.
 
