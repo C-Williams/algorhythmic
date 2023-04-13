@@ -297,7 +297,7 @@ def predict_output(model, audio_bytes):
     merge_test['Weighted Votes'] = merge_test.sum(axis=1)
     merge_test = merge_test.sort_values(by='Weighted Votes',ascending=False)
     new_df = pd.DataFrame(merge_test.head(5))
-    
+
     return new_df
 
 
@@ -315,7 +315,7 @@ def get_spotify_recs(sp, df):
         results = sp.search(q=f"genre:{genre}, tag:hipster", type='track', limit=50, market='US')
         
         if genre =='pop':
-            results = sp.search(q="genre:pop, tag:hipster", type='track',limit=50, market='US')
+            results = sp.search(q="genre:dance pop, tag:hipster", type='track',limit=50, market='US')
 
         choice = np.random.choice(len(results['tracks']['items']))
 
