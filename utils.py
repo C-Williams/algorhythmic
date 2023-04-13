@@ -245,9 +245,9 @@ def predict_spotify(df, model):
     return new_df
 
 
-def predict_output(model, path="./output.wav"):
+def predict_output(model, audio_bytes):
 
-    y, sr = librosa.load(path)
+    y, sr = librosa.load(io.BytesIO(audio_bytes))
     duration = librosa.get_duration(y=y, sr=sr)
     audio_file, _ = librosa.effects.trim(y)
     hop_length = 512
@@ -256,19 +256,22 @@ def predict_output(model, path="./output.wav"):
     mfcc_df = pd.DataFrame(mfccs.T)
     scaled_mfcc = scale_data(mfcc_df)
     condensed_mfcc= condense_output_data(scaled_mfcc, duration)
-    condensed_mfcc.columns = ['mfcc0_mean','mfcc1_mean','mfcc2_mean','mfcc3_mean','mfcc4_mean','mfcc5_mean','mfcc6_mean',
-                                'mfcc7_mean','mfcc8_mean','mfcc9_mean','mfcc10_mean','mfcc11_mean','mfcc0_std','mfcc1_std',
-                                'mfcc2_std','mfcc3_std','mfcc4_std','mfcc5_std','mfcc6_std','mfcc7_std','mfcc8_std','mfcc9_std',
-                                'mfcc10_std','mfcc11_std']
+    condensed_mfcc.columns = ['mfcc0_mean','mfcc1_mean','mfcc2_mean','mfcc3_mean','mfcc4_mean',
+                              'mfcc5_mean','mfcc6_mean','mfcc7_mean','mfcc8_mean','mfcc9_mean',
+                              'mfcc10_mean','mfcc11_mean','mfcc0_std','mfcc1_std','mfcc2_std',
+                              'mfcc3_std','mfcc4_std','mfcc5_std','mfcc6_std','mfcc7_std',
+                              'mfcc8_std','mfcc9_std','mfcc10_std','mfcc11_std']
     
     chromagram = librosa.feature.chroma_stft(y=audio_file, sr=sr, hop_length=hop_length)
     chromagram_df = pd.DataFrame(chromagram.T)
     scaled_chroma = scale_data(chromagram_df)
     condensed_chroma = condense_output_data(scaled_chroma, duration)
-    condensed_chroma.columns = ['chroma0_mean','chroma1_mean','chroma2_mean','chroma3_mean','chroma4_mean',
-                                'chroma5_mean','chroma6_mean','chroma7_mean','chroma8_mean','chroma9_mean','chroma10_mean',
-                                'chroma11_mean','chroma0_std','chroma1_std','chroma2_std','chroma3_std','chroma4_std','chroma5_std',
-                                'chroma6_std','chroma7_std','chroma8_std','chroma9_std','chroma10_std','chroma11_std']
+    condensed_chroma.columns = ['chroma0_mean','chroma1_mean','chroma2_mean','chroma3_mean',
+                                'chroma4_mean','chroma5_mean','chroma6_mean','chroma7_mean',
+                                'chroma8_mean','chroma9_mean','chroma10_mean','chroma11_mean',
+                                'chroma0_std','chroma1_std','chroma2_std','chroma3_std',
+                                'chroma4_std','chroma5_std','chroma6_std','chroma7_std',
+                                'chroma8_std','chroma9_std','chroma10_std','chroma11_std']
     
     tempo, beats = librosa.beat.beat_track(y=audio_file, sr=sr)
     tempo = round(tempo)
@@ -294,6 +297,7 @@ def predict_output(model, path="./output.wav"):
     merge_test['Weighted Votes'] = merge_test.sum(axis=1)
     merge_test = merge_test.sort_values(by='Weighted Votes',ascending=False)
     new_df = pd.DataFrame(merge_test.head(5))
+    
     return new_df
 
 
