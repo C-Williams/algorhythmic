@@ -11,3 +11,5 @@ scipy
 streamlit
 xgboost
 audio-recorder-streamlit
+soundfile
+io
