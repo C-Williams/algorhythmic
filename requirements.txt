@@ -6,9 +6,8 @@ plotly
 spotipy
 librosa
 tensorflow
-scikit-learn
-scipy
-streamlit
 xgboost
+scikit-learn
+streamlit
 audio-recorder-streamlit
 soundfile
