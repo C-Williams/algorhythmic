@@ -73,7 +73,8 @@ def api_call():
     client_id = st.secrets["CLIENT_ID"] # Also lives in .env
     client_secret = st.secrets["CLIENT_SECRET"] # Also lives in .env
     # Instantiate the response
-    client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
+    client_credentials_manager = SpotifyClientCredentials(client_id=client_id, 
+                                                          client_secret=client_secret)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
     return sp
@@ -92,8 +93,8 @@ st.write("""
     therefore, they *may* have a more "accurate" result.
     
     To test, type in information about the song below and click *"Submit"*. You can give
-    both the title of a song with or without an album name (if you type in the album, use 
-    a comma to separate the two names).
+    the title of a song with or without an album name (if you type in the album, use a 
+    comma to separate the two names).
 
     Double check that the album looks ilke what you expect, then press *"Yes"* or 
     *"No"* to see some insights about your song.
@@ -105,7 +106,8 @@ with st.form("my_form"):
     st.write("")
     artist_name = st.text_input("Who is it by?")
     st.write("")
-    assigned_genre = st.selectbox(label="What genre would you give this song?", options=sorted(list(name_dict.values())))
+    assigned_genre = st.selectbox(label="What genre would you give this song?", 
+                                  options=sorted(list(name_dict.values())))
 
    # Every form must have a submit button.
     submitted = st.form_submit_button("Submit", 
