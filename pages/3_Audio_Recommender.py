@@ -12,13 +12,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 from audio_recorder_streamlit import audio_recorder
 
-# Session states for Listening Prediction
-if 'recorded' not in st.session_state:
-    st.session_state.recorded = False
-
-if 'evaluated' not in st.session_state:
-    st.session_state.evaluated = False
-
 
 @st.cache_resource(ttl=3600)
 def api_call():
@@ -82,27 +75,23 @@ audio_bytes = audio_recorder(
     icon_size="6x",
 )
 
-@st.cache_resource
-def make_wav(audio):
-    with open('./output.wav', mode='bw') as f:
-        f.write(audio)
 
 if audio_bytes:
     st.audio(audio_bytes, format="audio/wav")
 
+
 if st.button("Evalute"):
     try:
-        make_wav(audio_bytes)
-
-        listen_preds = predict_output(model=listen_model)
+        listen_preds = predict_output(listen_model, audio_bytes)
         st.write(listen_preds)
 
         st.write("Here are some less known songs from these genres!")
         get_spotify_recs(sp, listen_preds)
-        st.session_state.predicted_listen = True
+
         st.write("""
         If you would like to test another sound, scroll up and click the 
         microphone again.""")
+        
     except TypeError:
         st.write("""
         Be sure you have recorded some noise before pressing *"Evaluate"*.
