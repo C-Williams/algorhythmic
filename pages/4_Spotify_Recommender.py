@@ -8,7 +8,7 @@ from tensorflow import keras
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-from utils import (display_spotify, 
+from utils import (display_spotify,
                    get_spotify_df,
                    predict_spotify,
                    name_dict,
@@ -73,7 +73,7 @@ def api_call():
     client_id = st.secrets["CLIENT_ID"] # Also lives in .env
     client_secret = st.secrets["CLIENT_SECRET"] # Also lives in .env
     # Instantiate the response
-    client_credentials_manager = SpotifyClientCredentials(client_id=client_id, 
+    client_credentials_manager = SpotifyClientCredentials(client_id=client_id,
                                                           client_secret=client_secret)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -82,7 +82,7 @@ def api_call():
 sp = api_call()
 
 
-st.markdown("# Let's test Spotify") 
+st.markdown("# Let's test Spotify")
 st.write("")
 st.write("")
 st.write("### How to use.")
@@ -93,10 +93,10 @@ st.write("""
     therefore, they *may* have a more "accurate" result.
     
     To test, type in information about the song below and click *"Submit"*. You can give
-    the title of a song with or without an album name (if you type in the album, use a 
+    the title of a song with or without an album name (if you type in the album, use a
     comma to separate the two names).
 
-    Double check that the album looks ilke what you expect, then press *"Yes"* or 
+    Double check that the album looks ilke what you expect, then press *"Yes"* or
     *"No"* to see some insights about your song.
     """)
 
@@ -106,11 +106,11 @@ with st.form("my_form"):
     st.write("")
     artist_name = st.text_input("Who is it by?")
     st.write("")
-    assigned_genre = st.selectbox(label="What genre would you give this song?", 
+    assigned_genre = st.selectbox(label="What genre would you give this song?",
                                   options=sorted(list(name_dict.values())))
 
    # Every form must have a submit button.
-    submitted = st.form_submit_button("Submit", 
+    submitted = st.form_submit_button("Submit",
                                       on_click=lock_form,
                                       disabled=st.session_state.lock_form)
 
@@ -123,13 +123,13 @@ if st.session_state.display:
     display_spotify(sp, song_title, artist_name, 0)
     col1, col2 = st.columns(2)
     with col1:
-        yes1 = st.button('Yes', 
-                         key='yes1', 
+        yes1 = st.button('Yes',
+                         key='yes1',
                          on_click=on_yes,
                          disabled=st.session_state.lock_buttons)
     with col2:
-        no1 = st.button('No', 
-                        key='no1', 
+        no1 = st.button('No',
+                        key='no1',
                         on_click=on_no,
                         disabled=st.session_state.lock_buttons)
 
@@ -139,7 +139,6 @@ if st.session_state.wrong_guess:
 if st.session_state.shown_albums:
     try:
         df_spotify = get_spotify_df(sp, song_title, artist_name)
-
 
         st.write(df_spotify)
 
