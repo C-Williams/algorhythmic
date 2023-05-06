@@ -293,9 +293,9 @@ def predict_output(model, audio_bytes):
     counts_three = probs_df['Third Guess'].value_counts()
 
     merge_test = pd.concat([counts_one, counts_two, counts_three], axis=1)
-    merge_test = merge_test.fillna(0)
-    merge_test['Weighted Votes'] = merge_test.sum(axis=1)
-    merge_test = merge_test.sort_values(by='Weighted Votes',ascending=False)
+    #merge_test = merge_test.fillna(0)
+    #merge_test['Weighted Votes'] = merge_test.sum(axis=1)
+    #merge_test = merge_test.sort_values(by='Weighted Votes',ascending=False)
     new_df = pd.DataFrame(merge_test.head(5))
 
     return merge_test
