@@ -298,7 +298,7 @@ def predict_output(model, audio_bytes):
     merge_test = merge_test.sort_values(by='Weighted Votes',ascending=False)
     new_df = pd.DataFrame(merge_test.head(5))
 
-    return probs_list
+    return probs_df
 
 
 def get_spotify_recs(sp, df):
