@@ -45,10 +45,9 @@ st.write("""
     As you are recording and testing, keep in mind that this site is being 
     hosted for free. Therefore, it may be a bit slow.
     
-    To start, make sure you are ready with your sounds, then click the grey
-    microphone. The microphone should turn green to let you know that you are
-    recording. Play at least 3 seconds of your sound, then push the microphone
-    again.
+    To start, make sure you are ready with your sounds, then select the length 
+    of time you wish to record and click the grey microphone. The microphone 
+    should turn green to let you know that you are recording.
 
     You can then play back your sounds to see if the quality is sufficient,
     if not, click the microphone to record again. Once you are pleased with your
@@ -60,12 +59,15 @@ st.write("""
     better, and less background noise is always appreciated!
 
     - In addition, because classical and hoerspiel music tends to be at a lower 
-    average volumne, if you get either of these and do not think they apply, try 
+    average volume, if you get either of these and do not think they apply, try 
     playing the song louder.
 
-    - Lastly, be a bit patient, it may run slowly, or break. Just refresh and try again.
+    - You may hear that the audio quality is lacking, this is because of audio
+    compression. Your speakers and microphone may not be the highest quality and
+    thus neither is the recording.
     """)
 
+slider = st.slider(label='Audio Length', min_value=3.0, max_value=30.0, step=1.0)
 
 audio_bytes = audio_recorder(
     text="",
@@ -73,6 +75,8 @@ audio_bytes = audio_recorder(
     neutral_color="#979797",
     icon_name="microphone",
     icon_size="6x",
+    energy_threshold=(-1.0, 1.0),
+    pause_threshold=slider,
 )
 
 
