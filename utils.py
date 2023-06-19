@@ -42,8 +42,6 @@ name_dict = {0: 'pop',1: 'rap',2: 'modern rock',3: 'urbano latino',4: 'edm',5: '
             39: 'nu jazz',40: 'boy band',41: 'desi hip hop',42: 'electronica',43: 'permanent wave',
             44: 'indietronica',45: 'punk',46: 'modern blues',47: 'vapor trap',48: 'mpb',49: 'classical'}
 
-
-
 # Set up the scaling process
 def scale_data(df, scaler = preprocessing.MinMaxScaler()):
     cols = df.columns
@@ -125,8 +123,6 @@ def display_spotify(sp, song_title, artist_name, num):
 
 
 def get_spotify_df(sp, song_title, artist_name):
-    st.write("Creating DataFrame...")
-    st.write("For a deeper explanation of these values see 'What is Sound'")
 
     temp_df = pd.DataFrame()
 
@@ -215,6 +211,18 @@ def get_spotify_df(sp, song_title, artist_name):
 
     temp_df = pd.concat([temp_df, combined_song_df])
 
+    st.write("""
+        The values in the following dataframe have been derived using the formulae explained on the What is Sound 
+        page.
+
+        In short, each row represents three seconds of audio. Each column contains a number which corresponds 
+        roughly to how much of each trait those three seconds of audio contain. For example, the first row
+        value for mfcc0_mean here is: """ + temp_df['mfcc0_mean'].iloc[0].round(4).astype(str) + """. 
+        This indicates the general loudness in this 3 second clip, the closer to 1 the louder the audio. 
+        Additionally, the value for chroma0_mean is:  """ + temp_df['chroma0_mean'].iloc[0].round(4).astype(str) 
+        + """. This tell us how loud C natural is for this period in the audio, the closer to 1 the louder C 
+        natural is heard.""")
+
     return(temp_df)
 
 
@@ -300,7 +308,7 @@ def predict_output(model, audio_bytes):
     merge_test = merge_test.sort_values(by='Weighted Votes',ascending=False)
     new_df = pd.DataFrame(merge_test.head(5))
 
-    return new_df
+    return combined, new_df
 
 
 def get_spotify_recs(sp, df):
