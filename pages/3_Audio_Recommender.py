@@ -2,7 +2,7 @@ import streamlit as st
 
 import xgboost as xgb
 
-from utils import (name_dict, 
+from utils import (name_dict,
                    predict_output,
                    get_spotify_recs)
 
@@ -86,7 +86,24 @@ if audio_bytes:
 
 if st.button("Evalute"):
     try:
-        listen_preds = predict_output(listen_model, audio_bytes)
+        details_df, listen_preds = predict_output(listen_model, audio_bytes)
+
+        st.write("""
+        The values in the following dataframe have been derived using the formulae explained on the What is Sound 
+        page.
+
+        In short, each row represents three seconds of audio. Each column contains a number which corresponds 
+        roughly to how much of each trait those three seconds of audio contain. For example, the first row
+        value for mfcc0_mean here is: """ + details_df['mfcc0_mean'].iloc[0].round(4).astype(str) + """. 
+        This indicates the general loudness in this 3 second clip, the closer to 1 the louder the audio. 
+        Additionally, the value for chroma0_mean is:  """ + details_df['chroma0_mean'].iloc[0].round(4).astype(str) 
+        + """. This tell us how loud C natural is for this period in the audio, the closer to 1 the louder C 
+        natural is heard.""")
+
+        st.write(details_df)
+
+        st.write("""
+        Using those values, we determined that this audio best suits these genres:""")
         st.write(listen_preds)
 
         st.write("Here are some less known songs from these genres!")
@@ -96,7 +113,7 @@ if st.button("Evalute"):
         If you would like to test another sound, scroll up and click the 
         microphone again.""")
         
-    except TypeError:
+    except:
         st.write("""
         Be sure you have recorded some noise before pressing *"Evaluate"*.
         """)
